@@ -26,6 +26,7 @@
 #include "widget-tree.h"
 #include "python-hooks.h"
 #include "python-shell.h"
+#include "gtkbuilder.h"
 
 #include "config.h"
 
@@ -113,6 +114,16 @@ on_send_action_to_shell_activate(GtkWidget *menuitem,
     }
 }
 
+static void
+on_dump_gtkbuilder_tree_activate(GtkWidget *menuitem,
+                                 ParasiteWindow *parasite)
+{
+    GtkWidget *widget = parasite_widget_tree_get_selected_widget(
+        PARASITE_WIDGET_TREE(parasite->widget_tree));
+    if (widget != NULL) {
+        dump_gtkbuilder_tree(widget);
+    }
+}
 
 static GtkWidget *
 create_widget_list_pane(ParasiteWindow *parasite)
@@ -270,6 +281,19 @@ create_action_list(ParasiteWindow *parasite)
     return vbox;
 }
 
+static void
+gtkparasite_add_gtkbuilder_menu(ParasiteWindow *window)
+{
+    GtkWidget *menuitem;
+
+    menuitem = gtk_menu_item_new_with_label("Dump GtkBuilder tree");
+    gtk_widget_show(menuitem);
+    gtk_menu_shell_append(GTK_MENU_SHELL(window->widget_popup), menuitem);
+
+    g_signal_connect(G_OBJECT(menuitem), "activate",
+                     G_CALLBACK(on_dump_gtkbuilder_tree_activate), window);
+}
+
 void
 gtkparasite_window_create()
 {
@@ -330,6 +354,8 @@ gtkparasite_window_create()
         g_signal_connect(G_OBJECT(menuitem), "activate",
                          G_CALLBACK(on_send_widget_to_shell_activate), window);
 
+        gtkparasite_add_gtkbuilder_menu(window);
+
         window->action_popup = gtk_menu_new();
         gtk_widget_show(window->action_popup);
 
@@ -339,6 +365,11 @@ gtkparasite_window_create()
 
         g_signal_connect(G_OBJECT(menuitem), "activate",
                          G_CALLBACK(on_send_action_to_shell_activate), window);
+    } else {
+        window->widget_popup = gtk_menu_new();
+        gtk_widget_show(window->widget_popup);
+
+        gtkparasite_add_gtkbuilder_menu(window);
     }
 }
 

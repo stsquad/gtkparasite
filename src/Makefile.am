@@ -16,6 +16,8 @@ libgtkparasite_la_SOURCES = \
 	python-shell.h \
 	widget-tree.h \
 	widget-tree.c \
+	gtkbuilder.c \
+	gtkbuilder.h \
 	window.c
 
 libgtkparasite_la_LDFLAGS = \
